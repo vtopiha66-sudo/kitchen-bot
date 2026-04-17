@@ -4,7 +4,7 @@ from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 
 from config import TOKEN
-from db import init_db
+from db import init_db, update_stock
 from logic import get_stock, check_deficit
 from i18n import t
 
@@ -18,8 +18,8 @@ user_lang = {}
 def main_kb(lang):
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="➕ Поповнення")
-            
+            [
+                KeyboardButton(text="➕ Поповнення"),
                 KeyboardButton(text=t("stock", lang)),
                 KeyboardButton(text=t("sales", lang))
             ],
@@ -65,17 +65,36 @@ async def handler(msg: Message):
 
     lang = user_lang.get(user_id, "ua")
 
-    # склад
-    if msg.text == t("stock", lang):
+    # ➕ пополнение
+    if msg.text == "➕ Поповнення":
+        await msg.answer("Введи: назва кількість\nНаприклад: креветки 5")
+        return
+
+    # 📦 склад
+    elif msg.text == t("stock", lang):
         stock = await get_stock()
         text = "\n".join([f"{n} — {s}" for n, s in stock]) or "Пусто"
         await msg.answer(text)
+        return
 
-    # дефицит
+    # ⚠️ дефицит
     elif msg.text == t("deficit", lang):
         items = await check_deficit()
         text = "\n".join([f"❗ {i[0]}" for i in items]) or "OK"
         await msg.answer(text)
+        return
+
+    # 🔥 ввод продукта (креветки 5)
+    elif " " in msg.text:
+        try:
+            name, amount = msg.text.split()
+            amount = float(amount)
+
+            await update_stock(name, amount)
+
+            await msg.answer(f"✅ Додано: {name} +{amount}")
+        except:
+            pass
 
 
 # ✅ запуск
