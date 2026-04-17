@@ -1,1 +1,2 @@
-
+TOKEN = 8056188117:AAEZMbE2EEwN_dKyQKPRqnt9AEcee_wbrhI
+ADMINS = [506701372]  # твой telegram id
