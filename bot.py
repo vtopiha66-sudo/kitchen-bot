@@ -40,7 +40,8 @@ def main_kb(lang):
                 KeyboardButton(text=t("recipes", lang))
             ],
             [
-                KeyboardButton(text=t("deficit", lang))
+                KeyboardButton(text=t("deficit", lang)),
+                KeyboardButton(text="⬅️ Назад")
             ]
         ],
         resize_keyboard=True
@@ -70,6 +71,9 @@ async def start(msg: Message):
 # =========================
 @dp.message()
 async def handler(msg: Message):
+    if not msg.text:
+        return  # защита от стикеров/фото
+
     user_id = msg.from_user.id
     text = msg.text.strip()
 
@@ -83,6 +87,12 @@ async def handler(msg: Message):
         lang = text.lower()
         user_lang[user_id] = lang
         await msg.answer(t("menu", lang), reply_markup=main_kb(lang))
+        return
+
+    # 🔙 назад
+    if text == "⬅️ Назад":
+        waiting_for_input[user_id] = None
+        await msg.answer("Головне меню", reply_markup=main_kb(lang))
         return
 
     # =========================
@@ -217,6 +227,9 @@ async def handler(msg: Message):
         await msg.answer("Вибери ID страви:\n\n" + text)
         return
 
+    # ❗ fallback
+    await msg.answer("❌ Не зрозумів команду")
+    
 
 # =========================
 # ▶️ ЗАПУСК
