@@ -36,5 +36,6 @@ TEXTS = {
     }
 }
 
+
 def t(key, lang):
-    return TEXTS[key][lang]
+    return TEXTS.get(key, {}).get(lang, key)
