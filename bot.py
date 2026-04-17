@@ -18,7 +18,8 @@ user_lang = {}
 def main_kb(lang):
     return ReplyKeyboardMarkup(
         keyboard=[
-            [
+            [KeyboardButton(text="➕ Поповнення")
+            
                 KeyboardButton(text=t("stock", lang)),
                 KeyboardButton(text=t("sales", lang))
             ],
