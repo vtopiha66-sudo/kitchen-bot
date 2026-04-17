@@ -1,28 +1,32 @@
 import aiosqlite
 
-DB = "db.sqlite"
+DB = "kitchen.db"
 
 async def init_db():
     async with aiosqlite.connect(DB) as db:
         await db.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            lang TEXT DEFAULT 'ua'
+        CREATE TABLE IF NOT EXISTS stock (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            amount REAL
         )
         """)
+        await db.commit()
 
-        await db.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            name TEXT PRIMARY KEY,
-            stock REAL,
-            min REAL
-        )
-        """)
 
-        await db.execute("""
-        CREATE TABLE IF NOT EXISTS dishes (
-            name TEXT PRIMARY KEY
-        )
-        """)
+async def get_stock():
+    async with aiosqlite.connect(DB) as db:
+        cursor = await db.execute("SELECT name, amount FROM stock")
+        return await cursor.fetchall()
 
+
+async def add_product(name, amount):
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("INSERT INTO stock (name, amount) VALUES (?, ?)", (name, amount))
+        await db.commit()
+
+
+async def update_stock(name, amount):
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("UPDATE stock SET amount = amount + ? WHERE name = ?", (amount, name))
         await db.commit()
