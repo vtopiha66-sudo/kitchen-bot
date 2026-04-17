@@ -14,7 +14,6 @@ dp = Dispatcher()
 user_lang = {}
 
 
-# ✅ клавиатура
 def main_kb(lang):
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -34,7 +33,6 @@ def main_kb(lang):
     )
 
 
-# ✅ старт
 @dp.message(Command("start"))
 async def start(msg: Message):
     kb = ReplyKeyboardMarkup(
@@ -44,18 +42,13 @@ async def start(msg: Message):
         resize_keyboard=True
     )
 
-    await msg.answer(
-        "Choose language / Обери мову / Wybierz język",
-        reply_markup=kb
-    )
+    await msg.answer("Choose language / Обери мову / Wybierz język", reply_markup=kb)
 
 
-# ✅ основной хендлер
 @dp.message()
 async def handler(msg: Message):
     user_id = msg.from_user.id
 
-    # выбор языка
     if msg.text in ["UA", "RU", "PL"]:
         lang = msg.text.lower()
         user_lang[user_id] = lang
@@ -64,20 +57,17 @@ async def handler(msg: Message):
 
     lang = user_lang.get(user_id, "ua")
 
-    # склад
     if msg.text == t("stock", lang):
         stock = await get_stock()
         text = "\n".join([f"{n} — {s}" for n, s in stock]) or "Пусто"
         await msg.answer(text)
 
-    # дефицит
     elif msg.text == t("deficit", lang):
         items = await check_deficit()
         text = "\n".join([f"❗ {i[0]}" for i in items]) or "OK"
         await msg.answer(text)
 
 
-# ✅ запуск
 async def main():
     await init_db()
     await dp.start_polling(bot)
