@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
-
+from menu import menu
 from config import TOKEN
 from db import init_db, update_stock
 from logic import get_stock, check_deficit
